@@ -1,0 +1,2 @@
+const IllnessNames = [];
+const InjuryNames = [];
