@@ -1,24 +1,54 @@
-class Condition {
+/**
+ * Represents a condition.
+ * @class
+ */
+export class Condition {
+    /** 
+     * Healing level ceiling value.
+     * @type {humber}
+     * @default
+     */
     static #MAXHEALING = 100;
+    /** 
+     * Healing level floor value.
+     * @type {humber}
+     * @default
+     */
     static #MINHEALING = -100;
 
-    static #conditionType = {
+    /**
+     * Valid condition types enum.
+     * @readonly
+     * @enum {string}
+     */
+    static conditionType = {
         INJURY: 'Injury',
         ILLNESS: 'Illness'
     };
 
-    #name;
-    #type;
-    #healing;
+    #condition;
 
+    /**
+     * Condition class constructor
+     * @param {string} name 
+     * @param {string} type 
+     */
     constructor(name, type) {
-        this.#name = name;
-        this.#type = type;
-        this.#healing = 0;
+        this.#condition = {
+            name: name,
+            type: type,
+            healing: 0
+        }
     }
 
+    /**
+     * Creates new condition of given name and type, returns the new Condition object.
+     * @param {string} newName 
+     * @param {string} newType 
+     * @returns {Condition}
+     */
     newCondition(newName, newType) {
-        const allowedConditionTypes = [INJURY, ILLNESS];
+        const allowedConditionTypes = [conditionType.INJURY, conditionType.ILLNESS];
 
         if (!allowedConditionTypes.includes(newType)) {
             throw new Error('Invalid type for condition: ' + newType);
@@ -27,48 +57,87 @@ class Condition {
         }
     }
 
-    toJSON() {
-        const conditionJson = {
-            conditionName: this.#name,
-            conditionType: this.#type,
-            conditionHealing: this.#healing
+    /**
+     * Creates new condition from a JSON-formatted string, returns the new Condition object.
+     * @param {string} str 
+     * @returns {Condition}
+     */
+    createFromJSONString(str) {
+        let tempObj;
+        let tempCondition;
+
+        try {
+            tempObj = JSON.parse(str);
+        } catch (error) {
+            console.error("Error parsing JSON in condition.js: " + error);
+            throw error;
         }
 
-        return conditionJson;
+        try {
+            tempCondition = newCondition(tempObj.name, tempObj.type);
+        } catch (error) {
+            throw error;
+        }
+
+        return tempCondition;
     }
 
-    getInfoString() {
-        // "Metabolic Disease [Illness] [0]"
-        return (`${this.#name} [${this.#type}] [${toString(this.#healing)}]`);
+    /**
+     * Returns JSON stringified condition object.
+     * @returns {string}
+     */
+    getJSONString() {
+        return JSON.stringify(this.#condition);
     }
 
+    /**
+     * 
+     * @returns {string}
+     */
     getName() {
-        return this.#name;
+        return this.#condition.name;
     }
 
+    /**
+     * 
+     * @returns {string}
+     */
     getType() {
-        return this.#type;
+        return this.#condition.type;
     }
 
+    /**
+     * 
+     * @returns {number}
+     */
     getHealingValue() {
-        return this.#healing;
+        return this.#condition.healing;
     }
 
+    /**
+     * 
+     * @returns {string}
+     */
     getHealingString() {
-        return toString(this.#healing);
+        return toString(this.#condition.healing);
     }
 
+    /**
+     * 
+     * @param {number} addedHealing 
+     * @returns {void}
+     */
     addHealing(addedHealing) {
-        const tempHealing = addedHealing + this.#healing;
+        const tempHealing = addedHealing + this.#condition.healing;
 
         if (tempHealing > MAXHEALING) {
-            this.#healing = MAXHEALING;
+            this.#condition.healing = MAXHEALING;
             return;
         } else if (tempHealing < MINHEALING) {
-            this.#healing = MINHEALING;
+            this.#condition.healing = MINHEALING;
             return;
         } else {
-            this.#healing = tempHealing;
+            this.#condition.healing = tempHealing;
             return;
         }
     }
